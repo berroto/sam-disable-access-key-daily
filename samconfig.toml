@@ -3,7 +3,7 @@ version = 0.1
 [default.deploy]
 [default.deploy.parameters]
 stack_name = "DisableAccessKeyDaily"
-s3_bucket = "sam-disable-access-key-daily"
+s3_bucket = "sam-bucket-application"
 s3_prefix = "DisableAccessKeyDaily"
 region = "eu-central-1"
 confirm_changeset = true
