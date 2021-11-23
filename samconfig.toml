@@ -1,0 +1,12 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "DisableAccessKeyDaily"
+s3_bucket = "sam-disable-access-key-daily"
+s3_prefix = "DisableAccessKeyDaily"
+region = "eu-central-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_NAMED_IAM"
+parameter_overrides = "Environment=\"Production\""
+

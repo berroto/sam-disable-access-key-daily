@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Disable the access of the users at specific Hour during the day. The event is fired by a cloudwatch event
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Parameters:
+  Environment:
+    Type: String
+    Default: Production
+
+# Resources declares the AWS resources that you want to include in the stack
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
+Resources:
+  # This is the Lambda function definition associated with the source code: sqs-payload-logger.js. For all available properties, see
+  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  ListAndDisableKeyPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: ListAndDisableKeyPolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: iam:UpdateAccessKey
+            Resource: arn:aws:iam::*:user/*
+          - Effect: Allow
+            Action: iam:ListUsers
+            Resource: "*"
+          - Effect: Allow
+            Action: iam:ListAccessKeys
+            Resource: arn:aws:iam::*:user/*
+
+  DisableAdminAccessKey:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: A Lambda function that disable all access keys at 18:00
+      Runtime: nodejs12.x
+      Handler: src/handlers/access-keys-disable.eventHandler
+      Events:
+        CloudWatchEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 17 * * ? *)
+      Policies:
+        - !Ref ListAndDisableKeyPolicy
+        - AWSLambdaBasicExecutionRole
+      MemorySize: 128
+      Timeout: 100
